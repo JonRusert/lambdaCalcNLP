@@ -2,3 +2,90 @@
 				lambdaCalcNLP
 				Author: Jon Rusert
 *******************************************************************************
+
+
+*******************************************************************************
+				Functionality of System
+*******************************************************************************
+The  main  program  in  our  system  is  the  Python  filelearnFromFile.py.
+learnFromAndQueryFile.py contains two different functionalities,learnFromFile() and queryWhatWeKnow().
+
+learnFromFile() takes in a text file (as well as Prolog database file) and converts each sentence into a Prolog rule.
+The current functionality converts nouns and verbs found in the file.  Text is tokenized and tagged by use of NLTK4.
+Nouns are converted to Prolog lambda expression in a similar look to those described insection 3.1.  Verbs are first
+identified as transitive or intransitive.  We determinethis in a simple fashion (since our program currently takes in
+simpler text files).If  a  verb  if  found  at  the  end  of  a  sentence  or  the  word  immediately  follow that
+word  is  not  a  noun,  then  it  is  labeled  as  intransitive.   Transitive  verbs are then determined as those who
+are immediately followed by a noun.  Sincedeterminants  represent  a  more  difficult  lambda  expression,  we  leave
+these  as hardcoded  in  the  Prolog  file.   Once  the  sentences  are  converted  into  logicalforms, we add the new
+logic to the passed in Prolog file.
+
+queryWhatWeKnow() takes in a Prolog database (generally just generated with the previous function) and allows users to
+enter in sentences to get the logical form  of  the  sentence.   If  the  logical  form  does  not  exist  in  the
+database  file, this is noted.  The database is assumed to contain the described CFG, as well as a formula to beta reduce
+the terms (these are both present in our example Prolog file [prologDatabase.pl].
+
+
+*******************************************************************************
+				Required Modules
+*******************************************************************************
+pyswip - https://github.com/yuce/pyswip
+swipl - http://www.swi-prolog.org/
+python - written in python 2
+NLTK - https://www.nltk.org/
+
+*******************************************************************************
+				Running the System
+*******************************************************************************
+python src/learnFromAndQueryFile.py knowledgeFile/luigisMansion.txt src/prologDatabase.pl
+
+
+*******************************************************************************
+				Running without Pyswip
+*******************************************************************************
+Since pyswip can be tedious to install, one can split up the learning and query
+into two separate steps.
+1st - python src/learnFromFile.py knowledgeFile/luigisMansion.txt src/prologDatabase.pl
+      (This learns from the file and updates the prolog database)
+
+2nd - swipl -s prologDatabase.pl
+      (This opens up prolog for queries)
+      In order to query for sentences (as above) the following should be used in Prolog:
+      s(X,[luigi, saves, mario], []), beta_reduce(X,Z). <--note the period!
+      To query sentences, replace [luigi, saves, mario] with other sentences split up in a list.
+
+
+
+*******************************************************************************
+				Examples of program running
+*******************************************************************************
+(If you wish to see how the program performs when running, below are examples)
+
+$ python src/learnFromAndQueryFile.py knowledgeFiles/luigisMansion.txt src/prologDatabase.pl
+Learning facts and rules from knowledgeFiles/luigisMansion.txt...
+
+Reading in knowledge from src/prologDatabase.pl...
+Please input the sentence (no punctuation) you want the logical form for (enter nothing to quit):
+luigi saves mario
+The logical form of "luigi saves mario" is luigi(l(X, mario(l(Y, saves(Y, X)))))
+
+Please input the sentence (no punctuation) you want the logical form for (enter nothing to quit):
+mario saves luigi
+The logical form of "mario saves luigi" is mario(l(X, luigi(l(Y, saves(Y, X)))))
+
+Please input the sentence (no punctuation) you want the logical form for (enter nothing to quit):
+luigi defeats bowser
+This information is not present in knowledge file
+
+Please input the sentence (no punctuation) you want the logical form for (enter nothing to quit):
+luigi wins
+The logical form of "luigi wins" is luigi(l(Z, wins(Z)))
+
+Please input the sentence (no punctuation) you want the logical form for (enter nothing to quit):
+luigi
+This information is not present in knowledge file
+
+Please input the sentence (no punctuation) you want the logical form for (enter nothing to quit):
+king_boo wins
+The logical form of "king_boo wins" is king_boo(l(W, wins(W)))
+

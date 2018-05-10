@@ -100,23 +100,23 @@ def queryWhatWeKnow(prologFile):
         sent = curQuery.strip().split()
         result = prolog.query('s(X,' + str(sent) + ',[]),beta_reduce(X,Z)')
 
-        print("This information is not present in knowledge file\n")    
+        try:
+            curRes = dict(list(result)[0])["Z"] 
+        except IndexError:
+            print("This information is not present in knowledge file\n")    
+        else:
+            tmpVars = curRes.split('G')
+            for curVar in range(1, len(tmpVars)):
+                curVar = '_G' + tmpVars[curVar][:3]
+                if(curVar not in varDict):
+                    varDict[curVar] = variables[varCount]
+                    varCount +=1
+
+            for repVar in varDict:
+                curRes = curRes.replace(repVar, varDict[repVar])
+
         
-        curRes = dict(list(result)[0])["Z"] 
-    
-        tmpVars = curRes.split('G')
-        for curVar in range(1, len(tmpVars)):
-            curVar = '_G' + tmpVars[curVar][:3]
-            if(curVar not in varDict):
-                varDict[curVar] = variables[varCount]
-                varCount +=1
-
-
-        for repVar in varDict:
-            curRes = curRes.replace(repVar, varDict[repVar])
-
-        
-        print("The logical form of \"" + curQuery + "\" is "  + curRes + "\n")
+            print("The logical form of \"" + curQuery + "\" is "  + curRes + "\n")
 
         curQuery = raw_input("Please input the sentence (no punctuation) you want the logical form for (enter nothing to quit):\n")
 
